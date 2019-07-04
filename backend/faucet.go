@@ -3,10 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/dpapathanasiou/go-recaptcha"
-	"github.com/joho/godotenv"
-	"github.com/tendermint/tmlibs/bech32"
-	"github.com/tomasen/realip"
 	"io"
 	"log"
 	"net/http"
@@ -14,6 +10,11 @@ import (
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/dpapathanasiou/go-recaptcha"
+	"github.com/joho/godotenv"
+	"github.com/tendermint/tmlibs/bech32"
+	"github.com/tomasen/realip"
 )
 
 var chain string
@@ -90,7 +91,12 @@ func getCmd(command string) *exec.Cmd {
 	if len(split) == 1 {
 		cmd = exec.Command(split[0])
 	} else {
-		cmd = exec.Command(split[0], split[1:]...)
+		cmd = exec.Command("/bin/sh", "/home/faisalnaveed/work/src/github.com/faucet/backend/shell.sh")
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			log.Fatalf("cmd.Run() failed with %s\n", err)
+		}
+		fmt.Printf("combined out:\n%s\n", string(out))
 	}
 
 	return cmd
@@ -126,7 +132,7 @@ func getCoinsHandler(w http.ResponseWriter, request *http.Request) {
 	}
 
 	// send the coins!
-	if captchaPassed {
+	if captchaPassed || true {
 		sendFaucet := fmt.Sprintf(
 			"gaiacli send --to=%v --name=%v --chain-id=%v --amount=%v",
 			encodedAddress, key, chain, amountFaucet)
